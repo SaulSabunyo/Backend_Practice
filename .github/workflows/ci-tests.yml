@@ -1,0 +1,53 @@
+name: CI for API Tests
+# 1. Define the trigger event 
+name: CI for API Tests
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+env:
+  DATABASE_URL: postgresql://postgres:Saulwpnz@localhost:5432/testdb
+# 2. Define the job to run tests
+jobs:
+  test_api:
+  # 3. Specify the runner environment  
+    runs-on: ubuntu-latest
+  # 4. Set up PostgreSQL service
+    services:
+      postgres:
+        image: postgres:13
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: Saulwpnz
+          POSTGRES_DB: testdb
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd="pg_isready -U testuser -d testdb"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=5
+    # 5 Define the steps to set up and run tests
+    steps:
+    # step1. Checkout the repository code
+      - name: Checkout repository code
+        uses: actions/checkout@v4
+    # step2. Set up Node.js environment
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+    # step3. Install dependencies and run tests
+      - name: Install dependencies
+        run: npm ci
+      - name: Set up testdb
+        run: |
+          npx prisma migrate deploy
+    # step4. Run Jest/Supertest API tests
+      - name: Run Jest/Supertest API tests
+        run: npm test
