@@ -12,6 +12,7 @@ on:
 
 env:
   DATABASE_URL: postgresql://postgres:Saulwpnz@localhost:5432/testdb
+  JWT_SECRET: "1234Secret"
 # 2. Define the job to run tests
 jobs:
   test_api:
